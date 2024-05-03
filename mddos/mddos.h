@@ -28,10 +28,12 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include <string.h>
+#include <signal.h>
 
 #include <dos.h>
 #include <conio.h>
 
+#include <pc.h>
 #include <go32.h>
 #include <dpmi.h>
 #include <sys/farptr.h>
@@ -48,10 +50,31 @@ typedef uint16_t u16;
 typedef uint32_t u32;
 typedef uint64_t u64;
 
+typedef int8_t  i8;
+typedef int16_t i16;
+typedef int32_t i32;
+typedef int64_t i64;
+
+typedef unsigned int uint;
+
 typedef u8 bool;
 
 #define true (!(0))
 #define false (0)
+
+//
+// IMG
+//
+
+// -----------------------------------------------------------------------------
+typedef struct tagIMG {
+  u16 width;
+  u16 height;
+  u8 *data;
+} IMG;
+
+// -----------------------------------------------------------------------------
+bool LoadImg(FILE *fp, IMG *img);
 
 
 //
@@ -60,45 +83,6 @@ typedef u8 bool;
 
 // -----------------------------------------------------------------------------
 u32 GetFileSize(FILE *fp);
-
-
-//
-// IMG
-//
-
-// -----------------------------------------------------------------------------
-typedef struct tagIMG {
-    u16 width;
-    u16 height;
-    u8 *data;
-} IMG;
-
-// -----------------------------------------------------------------------------
-bool LoadImg(FILE *fp, IMG *img);
-
-
-//
-// PAL
-//
-
-// -----------------------------------------------------------------------------
-typedef struct tagRGB {
-    u8 r, g, b;
-} RGB;
-
-typedef struct tagPAL {
-    u16 count;
-    RGB *colors;
-} PAL;
-
-// -----------------------------------------------------------------------------
-bool LoadPal(FILE *fp, PAL *pal);
-
-// -----------------------------------------------------------------------------
-void SetPaletteColor(u8 index, u8 red, u8 green, u8 blue);
-
-// -----------------------------------------------------------------------------
-void SetPaletteWithPal(PAL *pal);
 
 
 //
@@ -115,9 +99,53 @@ void SetTextMode();
 
 // -----------------------------------------------------------------------------
 extern char VIRTUAL_SCREEN[SCREEN_HEIGHT * SCREEN_WIDTH];
-#define VirtualScreenXY(x, y) VIRTUAL_SCREEN[(y) * SCREEN_WIDTH + (x)]
 
-#define BlitVirtualScreen() dosmemput(VIRTUAL_SCREEN, sizeof(VIRTUAL_SCREEN), 0xA0000)
+#define VirtualScreenXY(x, y) \
+  VIRTUAL_SCREEN[(y) * SCREEN_WIDTH + (x)]
+
+#define BlitVirtualScreen() \
+  dosmemput(VIRTUAL_SCREEN, sizeof(VIRTUAL_SCREEN), 0xA0000)
+
+//
+// Keyboard
+//
+
+// -----------------------------------------------------------------------------
+#define KEYBOARD_VALUE_CONTROL_C 3
+
+
+//
+// Mouse
+//
+
+// -----------------------------------------------------------------------------
+bool InitializeMouse();
+bool MouseIsInitialized();
+bool GetMousePosition(uint *x, uint *y, uint *buttonState);
+
+
+//
+// PAL
+//
+
+// -----------------------------------------------------------------------------
+typedef struct tagRGB {
+  u8 r, g, b;
+} RGB;
+
+typedef struct tagPAL {
+  u16 count;
+  RGB *colors;
+} PAL;
+
+// -----------------------------------------------------------------------------
+bool LoadPal(FILE *fp, PAL *pal);
+
+// -----------------------------------------------------------------------------
+void SetPaletteColor(u8 index, u8 red, u8 green, u8 blue);
+
+// -----------------------------------------------------------------------------
+void SetPaletteWithPal(PAL *pal);
 
 
 //
