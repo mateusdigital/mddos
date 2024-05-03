@@ -33,26 +33,32 @@ cd ..
 @REM ---------------------------------------------------------------------------
 @REM Navigate to the source folder.
 cd ..
-cd dos-programs
+cd apps
 
 @REM Create the dos folder
-md dos
+set "build_dir=build";
+if not exist "%build_dir%" (
+    md %build_dir%
+)
 
+
+@REM @REM ---------------------------------------------------------------------------
+@REM @REM imgview
+@REM cd imgview
+@REM call build.bat
+@REM mv imgview.exe ../dos
+@REM cd ..
+
+@REM @REM ---------------------------------------------------------------------------
+@REM @REM palview
+@REM cd palview
+@REM call build.bat
+@REM mv palview.exe ../dos
+@REM cd ..
 
 @REM ---------------------------------------------------------------------------
-@REM imgview
-cd imgview
+@REM mouse
+cd mouse
 call build.bat
-mv imgview.exe ../dos
+move /Y mouse.exe ../%build_dir%
 cd ..
-
-@REM ---------------------------------------------------------------------------
-@REM palview
-cd palview
-call build.bat
-mv palview.exe ../dos
-cd ..
-
-@REM // ------------------------------------------------------------------------
-@REM Move the dos folder to the tools
-mv dos ../tools
